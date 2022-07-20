@@ -3344,11 +3344,16 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     if (!markedText) markedText = @"";
     if (_markedTextRange == nil) {
         _markedTextRange = [YYTextRange rangeWithRange:NSMakeRange(_selectedTextRange.end.offset, markedText.length)];
-        [_innerText replaceCharactersInRange:NSMakeRange(_selectedTextRange.end.offset, 0) withString:markedText];
+        NSRange range = NSMakeRange(_selectedTextRange.end.offset, 0);
+        if(_innerText.length > range.location+range.length) {
+            [_innerText replaceCharactersInRange:range withString:markedText];
+        }
         _selectedTextRange = [YYTextRange rangeWithRange:NSMakeRange(_selectedTextRange.start.offset + selectedRange.location, selectedRange.length)];
     } else {
         _markedTextRange = [self _correctedTextRange:_markedTextRange];
-        [_innerText replaceCharactersInRange:_markedTextRange.asRange withString:markedText];
+        if(_innerText.length > _markedTextRange.asRange.location + _markedTextRange.asRange.length) {
+            [_innerText replaceCharactersInRange:_markedTextRange.asRange withString:markedText];
+        }
         _markedTextRange = [YYTextRange rangeWithRange:NSMakeRange(_markedTextRange.start.offset, markedText.length)];
         _selectedTextRange = [YYTextRange rangeWithRange:NSMakeRange(_markedTextRange.start.offset + selectedRange.location, selectedRange.length)];
     }
